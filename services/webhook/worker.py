@@ -24,3 +24,13 @@ def analyze_pr(pr_id: str, pr_number: int, repo_full_name: str, head_sha: str, i
             },
             timeout=120,
         )
+
+
+@app.task(name="trigger_learning")
+def trigger_learning(repo_full_name: str, pr_id: str):
+    with httpx.Client() as client:
+        client.post(
+            "http://learner:8004/learn",
+            json={"repo_full_name": repo_full_name, "pr_id": pr_id},
+            timeout=60,
+        )
