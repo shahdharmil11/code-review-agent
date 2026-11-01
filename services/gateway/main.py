@@ -9,6 +9,9 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from models import Settings
 
 settings = Settings()
+if not settings.github_webhook_secret:
+    raise RuntimeError("GITHUB_WEBHOOK_SECRET must be set")
+
 app = FastAPI()
 Instrumentator().instrument(app).expose(app)
 
