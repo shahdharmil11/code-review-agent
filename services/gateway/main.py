@@ -4,11 +4,13 @@ import hmac
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from models import Settings
 
 settings = Settings()
 app = FastAPI()
+Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/health")
