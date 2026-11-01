@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -11,6 +12,7 @@ engine = create_async_engine(settings.database_url)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 app = FastAPI()
+Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/health")
