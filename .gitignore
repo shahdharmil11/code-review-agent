@@ -1,0 +1,42 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+
+# Kubernetes
+*.kubeconfig
+infra/k8s/secret.yaml
+
+# Secrets
+*.pem
+*.key
+
+# Test artifacts
+test-results/
+playwright-report/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
