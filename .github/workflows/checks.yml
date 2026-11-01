@@ -1,0 +1,60 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Lint and syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ruff
+        run: pip install ruff
+      - name: Lint (errors only)
+        run: ruff check --select E9,F63,F7,F82 .
+      - name: Compile all Python files
+        run: |
+          files=$(git ls-files '*.py')
+          if [ -n "$files" ]; then python -m py_compile $files; else echo "No Python files yet"; fi
+
+  terraform:
+    name: Terraform format and validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        if: hashFiles('infra/terraform/**/*.tf') != ''
+      - name: Format check
+        if: hashFiles('infra/terraform/**/*.tf') != ''
+        run: terraform -chdir=infra/terraform fmt -check -recursive
+      - name: Validate
+        if: hashFiles('infra/terraform/**/*.tf') != ''
+        run: |
+          terraform -chdir=infra/terraform init -backend=false
+          terraform -chdir=infra/terraform validate
+
+  docker:
+    name: Build service images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build each service that has a Dockerfile
+        run: |
+          shopt -s nullglob
+          dockerfiles=(services/*/Dockerfile)
+          if [ ${#dockerfiles[@]} -eq 0 ]; then echo "No services yet"; exit 0; fi
+          for df in "${dockerfiles[@]}"; do
+            svc=$(basename "$(dirname "$df")")
+            echo "::group::Building $svc"
+            docker build -f "$df" -t "code-review-agent/$svc:ci" .
+            echo "::endgroup::"
+          done
