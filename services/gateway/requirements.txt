@@ -1,5 +1,5 @@
-fastapi
-uvicorn
-httpx
-pydantic-settings
-prometheus-fastapi-instrumentator
+fastapi==0.162.0
+uvicorn==0.54.0
+httpx==0.28.1
+pydantic-settings==2.16.2
+prometheus-fastapi-instrumentator==8.1.0
